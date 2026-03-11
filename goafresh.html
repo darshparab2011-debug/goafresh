@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Kasa Amora · Goa Fresh (save changes)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* DARK THEME */
+    body {
+      background: #0f1419;
+      color: #eef2f5;
+      padding-bottom: 140px;
+    }
+
+    /* top bar */
+    .app-bar {
+      background: rgba(18, 26, 32, 0.85);
+      backdrop-filter: blur(20px);
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #3a4a54;
+      box-shadow: 0 12px 28px -8px #010101;
+      position: sticky;
+      top: 0;
+      z-index: 1200;
+    }
+
+    .brand h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #ffb281, #f5a56b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand span {
+      background: #423d38;
+      color: #ffdbb5;
+      font-size: 0.8rem;
+      padding: 4px 12px;
+      border-radius: 40px;
+      border: 1px solid #b27b54;
+    }
+
+    .location-chip {
+      background: #262e34;
+      border-radius: 60px;
+      padding: 8px 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #efdbcd;
+      border: 1px solid #5f5a53;
+      font-size: 0.95rem;
+    }
+
+    .location-chip strong {
+      background: #c47642;
+      color: #010101;
+      padding: 3px 12px;
+      border-radius: 30px;
+    }
+
+    .status-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #1e2a31dd;
+      backdrop-filter: blur(6px);
+      padding: 6px 16px;
+      border-radius: 60px;
+      border: 1px solid #4a5a64;
+    }
+
+    .online-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 40px;
+      transition: 0.1s;
+    }
+    .online-indicator:hover {
+      background: #2d414d;
+    }
+
+    .dot {
+      height: 12px;
+      width: 12px;
+      border-radius: 20px;
+      background: #43b581;
+      box-shadow: 0 0 0 3px rgba(67, 181, 129, 0.35);
+    }
+
+    .dot.offline {
+      background: #7f8d9c;
+    }
+
+    .owner-btn {
+      background: #2d3c45;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fcd7b3;
+      cursor: pointer;
+      border: 1px solid #7a6e5f;
+    }
+
+    /* ADMIN PANEL with SAVE CHANGES button */
+    .admin-panel {
+      background: #1f2b33;
+      border-radius: 40px;
+      margin: 10px 20px 20px;
+      padding: 20px 28px;
+      border: 2px solid #6f8a9a;
+      box-shadow: 0 10px 22px #030608;
+      display: none;
+    }
+
+    .admin-panel h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fac89d;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .admin-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+    }
+
+    .admin-field {
+      flex: 1 1 180px;
+    }
+
+    .admin-field label {
+      display: block;
+      font-size: 0.8rem;
+      color: #bebebe;
+      margin-bottom: 4px;
+    }
+
+    .admin-field input {
+      width: 100%;
+      padding: 12px 16px;
+      background: #12212b;
+      border: 2px solid #4d6572;
+      border-radius: 60px;
+      color: white;
+    }
+
+    .admin-btn {
+      background: #b37648;
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid #e2a36e;
+      font-size: 1rem;
+      margin-right: 10px;
+    }
+
+    .save-all-btn {
+      background: #3c8d7c;
+      border: 2px solid #87c9b5;
+    }
+    .save-all-btn:hover {
+      background: #2f7264;
+    }
+
+    .admin-note {
+      font-size: 0.85rem;
+      color: #cfb295;
+      margin-top: 12px;
+    }
+
+    /* menu grid */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 25px 20px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .food-card {
+      background: #1f2a31;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 22px 38px -14px #02070a;
+      transition: 0.25s;
+      border: 1px solid #3b4b56;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .delete-item-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #c15541;
+      color: white;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 40px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      cursor: pointer;
+      z-index: 50;
+      display: none;
+      box-shadow: 0 4px 10px black;
+      border: 2px solid #f4b28d;
+    }
+
+    .admin-active .delete-item-btn {
+      display: block;
+    }
+
+    .card-image {
+      height: 150px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px;
+    }
+
+    .price-badge {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #fec195;
+      border: 1px solid #c07c51;
+    }
+
+    .card-content {
+      padding: 16px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-content h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f2e1d4;
+    }
+
+    .add-btn {
+      background: #2d4d5a;
+      border: none;
+      color: #ffebdb;
+      font-weight: 700;
+      padding: 14px 0;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 8px 18px #111f24;
+      border: 1px solid #608b92;
+    }
+
+    .add-btn:hover {
+      background: #1f4452;
+    }
+
+    /* address bar */
+    .address-bar {
+      background: #1b2932;
+      border-radius: 60px;
+      margin: 5px 20px 15px;
+      padding: 16px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      border: 2px solid #786c5e;
+    }
+
+    .address-input-wrapper {
+      flex: 2 1 300px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .address-input-wrapper input {
+      flex: 3;
+      padding: 14px 22px;
+      border: 2px solid #5c6e7c;
+      border-radius: 60px;
+      background: #11212b;
+      color: white;
+    }
+
+    .address-status {
+      font-size: 0.9rem;
+      color: #f5b986;
+    }
+
+    /* bottom cart */
+    #cart {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(10, 18, 24, 0.94);
+      backdrop-filter: blur(26px);
+      padding: 12px 22px 16px;
+      border-top-left-radius: 36px;
+      border-top-right-radius: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 2000;
+      border: 1px solid #57656e;
+    }
+
+    .cart-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .cart-icon-bubble {
+      background: #bb784b;
+      padding: 12px 22px;
+      border-radius: 60px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #0f0f0f;
+    }
+
+    .cart-items-scroll {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      max-width: 500px;
+      overflow-x: auto;
+      padding: 4px;
+    }
+
+    .cart-item-pill {
+      background: #1c3843;
+      border-radius: 60px;
+      padding: 8px 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #7799a8;
+      color: #f4e9dd;
+    }
+
+    .quant-badge {
+      background: #976f4f;
+      color: #161616;
+      border-radius: 30px;
+      padding: 3px 12px;
+      font-weight: 800;
+    }
+
+    .remove-item-cart {
+      background: none;
+      border: none;
+      color: #faa67b;
+      font-size: 1.7rem;
+      cursor: pointer;
+    }
+
+    .cart-right-area {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .total-pill {
+      background: #1b2d36;
+      padding: 10px 28px;
+      border-radius: 60px;
+      font-weight: 800;
+      font-size: 1.7rem;
+      color: #ffca9e;
+    }
+
+    .order-btn {
+      background: #d38f5c;
+      border: none;
+      color: #151515;
+      font-weight: 800;
+      padding: 14px 34px;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    .order-btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* password modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s;
+    }
+
+    .modal-overlay.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal-card {
+      background: #1d2a33;
+      max-width: 360px;
+      width: 90%;
+      padding: 2.2rem 1.8rem;
+      border-radius: 56px;
+      text-align: center;
+      border: 2px solid #856e58;
+    }
+
+    .modal-card h3 {
+      color: #fad8b6;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .modal-card input {
+      width: 100%;
+      padding: 16px 24px;
+      border: 3px solid #73645a;
+      border-radius: 60px;
+      background: #16232b;
+      color: #f0e1cf;
+      margin-bottom: 22px;
+    }
+
+    .modal-actions button {
+      background: #9f6f4b;
+      border: none;
+      color: #f5e8dc;
+      padding: 14px 26px;
+      border-radius: 60px;
+      font-weight: 700;
+      margin: 0 8px;
+      cursor: pointer;
+    }
+
+    .modal-actions button.cancel {
+      background: #43555f;
+    }
+  </style>
+</head>
+<body>
+
+<!-- top app bar -->
+<div class="app-bar">
+  <div class="brand">
+    <h1>goa fresh</h1>
+    <span>delivery</span>
+  </div>
+  <div class="location-chip">
+    <i>📍</i> Kasa Amora <strong>only</strong>
+  </div>
+  <div class="status-section">
+    <div class="online-indicator" id="statusIndicator">
+      <div class="dot" id="statusDot"></div>
+      <div class="status-text" id="statusMessage">online</div>
+    </div>
+    <button class="owner-btn" id="toggleStatusBtn">🔒 owner</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL with SAVE ALL CHANGES button -->
+<div class="admin-panel" id="adminPanel">
+  <h3>⚙️ admin — manage menu</h3>
+  <div class="admin-row">
+    <div class="admin-field">
+      <label>dish name</label>
+      <input type="text" id="newName" placeholder="e.g. Crab Xec Xec">
+    </div>
+    <div class="admin-field">
+      <label>price (₹)</label>
+      <input type="number" id="newPrice" placeholder="320">
+    </div>
+    <div class="admin-field">
+      <label>image URL (food photo)</label>
+      <input type="url" id="newImage" placeholder="https://...">
+    </div>
+    <button class="admin-btn" id="addItemBtn">➕ add item</button>
+    <button class="admin-btn save-all-btn" id="saveChangesBtn">💾 SAVE ALL CHANGES</button>
+  </div>
+  <div class="admin-note">✕ delete buttons appear on each card. Click SAVE to make changes permanent.</div>
+</div>
+
+<!-- menu grid -->
+<div class="menu-grid" id="menu"></div>
+
+<!-- custom order card -->
+<div class="custom-card" style="background: #1f2b33; border-radius: 40px; padding: 18px 28px; margin: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 15px; border: 2px solid #4e565c;">
+  <h3 style="font-size:1.6rem; background: linear-gradient(145deg, #ffb687, #e5955c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🍛 custom order</h3>
+  <div class="custom-input-group" style="display: flex; flex:2 1 300px; gap:12px;">
+    <input type="text" id="customInput" placeholder="e.g. 'Chicken xacuti'" style="flex:3; padding:16px 22px; border:2px solid #4e5e68; border-radius:60px; background:#1f2f38; color:white;">
+    <button id="addCustomBtn" style="flex:1 0 130px; background:#a66942; border:none; color:white; font-weight:800; border-radius:60px; cursor:pointer;">+ add</button>
+  </div>
+</div>
+
+<!-- address bar -->
+<div class="address-bar">
+  <label><i>📮</i> delivery address</label>
+  <div class="address-input-wrapper">
+    <input type="text" id="addressInput" placeholder="flat / house / landmark *">
+  </div>
+  <div class="address-status" id="addressStatus">⚠️ required</div>
+</div>
+
+<!-- BOTTOM CART -->
+<div id="cart">
+  <div class="cart-left">
+    <div class="cart-icon-bubble">🛒 <span id="cartCount">0</span></div>
+    <div class="cart-items-scroll" id="cartItemsContainer">
+      <span class="empty-cart-msg">your cart is empty</span>
+    </div>
+  </div>
+  <div class="cart-right-area">
+    <div class="total-pill" id="cartTotal">₹0</div>
+    <button class="order-btn" id="placeOrderBtn" onclick="attemptPlaceOrder()">order</button>
+  </div>
+</div>
+
+<!-- password modal -->
+<div class="modal-overlay" id="passwordModal">
+  <div class="modal-card">
+    <h3>🔐 owner</h3>
+    <input type="password" id="passwordInput" placeholder="passcode">
+    <div class="modal-actions">
+      <button id="submitPassword">confirm</button>
+      <button class="cancel" id="cancelPassword">cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- LOAD SAVED MENU from localStorage (if exists) ----------
+    let foods = [];
+    const storedMenu = localStorage.getItem('goaFreshMenu');
+    if (storedMenu) {
+      try {
+        foods = JSON.parse(storedMenu);
+      } catch (e) {
+        foods = [];
+      }
+    }
+    // If nothing stored, use default menu
+    if (!foods || foods.length === 0) {
+      foods = [
+        { name: "Chicken Biryani", price: 210, img: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&auto=format" },
+        { name: "Goan Fish Curry", price: 250, img: "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400&auto=format" },
+        { name: "Prawn Balchão", price: 290, img: "https://images.unsplash.com/photo-1625943553852-781c6dd46faa?w=400&auto=format" },
+        { name: "Veg Xacuti", price: 170, img: "https://images.unsplash.com/photo-1645112411342-4665a10a5b2c?w=400&auto=format" },
+        { name: "Beef Chilli fry", price: 260, img: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400&auto=format" },
+        { name: "Sorpotel", price: 280, img: "https://images.unsplash.com/photo-1631515243760-e06f3e7731e9?w=400&auto=format" }
+      ];
+    }
+
+    // ---------- STATE ----------
+    let cart = [];
+    let isOpen = true;
+    let isAdmin = false;
+    const CORRECT_PASS = "1234";
+    const OWNER_PHONE = "7030159762";
+
+    let deliveryAddress = '';
+
+    // DOM elements
+    const menuDiv = document.querySelector('.menu-grid');
+    const cartCountSpan = document.getElementById('cartCount');
+    const cartContainer = document.getElementById('cartItemsContainer');
+    const cartTotalSpan = document.getElementById('cartTotal');
+    const statusDot = document.getElementById('statusDot');
+    const statusMsg = document.getElementById('statusMessage');
+    const toggleBtn = document.getElementById('toggleStatusBtn');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const customInput = document.getElementById('customInput');
+    const addCustomBtn = document.getElementById('addCustomBtn');
+    const addressInput = document.getElementById('addressInput');
+    const addressStatus = document.getElementById('addressStatus');
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    // admin panel
+    const adminPanel = document.getElementById('adminPanel');
+    const newName = document.getElementById('newName');
+    const newPrice = document.getElementById('newPrice');
+    const newImage = document.getElementById('newImage');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const saveChangesBtn = document.getElementById('saveChangesBtn');
+
+    // modal
+    const modal = document.getElementById('passwordModal');
+    const passInput = document.getElementById('passwordInput');
+    const submitPass = document.getElementById('submitPassword');
+    const cancelPass = document.getElementById('cancelPassword');
+
+    // ---------- SAVE MENU TO LOCALSTORAGE (permanent) ----------
+    function saveMenuToStorage() {
+      localStorage.setItem('goaFreshMenu', JSON.stringify(foods));
+      alert('✅ Menu changes saved permanently! Anyone with the link will see this updated menu.');
+    }
+
+    // ---------- render menu from 'foods' array ----------
+    function renderMenu() {
+      menuDiv.innerHTML = '';
+      foods.forEach((food, index) => {
+        const card = document.createElement('div');
+        card.className = 'food-card';
+        card.setAttribute('data-food-index', index);
+        card.innerHTML = `
+          <button class="delete-item-btn" data-index="${index}">✕</button>
+          <div class="card-image" style="background-image: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 60%), url('${food.img}');">
+            <div class="price-badge">₹${food.price}</div>
+          </div>
+          <div class="card-content">
+            <h3>${food.name}</h3>
+            <button class="add-btn" data-index="${index}">➕ add to cart</button>
+          </div>
+        `;
+        menuDiv.appendChild(card);
+      });
+
+      // attach add-to-cart listeners
+      document.querySelectorAll('.add-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!isOpen) { alert('🍴 offline'); return; }
+          const idx = e.currentTarget.getAttribute('data-index');
+          if (idx !== null) addToCart(parseInt(idx));
+        });
+      });
+
+      // attach delete listeners
+      document.querySelectorAll('.delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!isAdmin) {
+            alert('Admin only');
+            return;
+          }
+          const idx = btn.getAttribute('data-index');
+          if (idx !== null && confirm('Remove this item from menu?')) {
+            foods.splice(parseInt(idx), 1);
+            renderMenu();  // re-render
+          }
+        });
+      });
+    }
+
+    // ---------- set admin mode ----------
+    function setAdminMode(adminStatus) {
+      isAdmin = adminStatus;
+      if (isAdmin) {
+        adminPanel.style.display = 'block';
+        document.body.classList.add('admin-active');
+      } else {
+        adminPanel.style.display = 'none';
+        document.body.classList.remove('admin-active');
+      }
+      renderMenu(); // to refresh delete button visibility
+    }
+
+    // ---------- cart functions ----------
+    function addToCart(index) {
+      if (!isOpen) return;
+      const food = foods[index];
+      const existing = cart.find(item => item.name === food.name && !item.isCustom);
+      if (existing) existing.quantity++;
+      else cart.push({ name: food.name, price: food.price, quantity: 1, isCustom: false });
+      updateCartUI();
+    }
+
+    function addCustomItem() {
+      if (!isOpen) { alert('closed'); return; }
+      let text = customInput.value.trim();
+      if (text === '') text = 'special';
+      const customName = '✨ ' + text;
+      const existing = cart.find(item => item.name === customName);
+      if (existing) existing.quantity++;
+      else cart.push({ name: customName, price: 190, quantity: 1, isCustom: true });
+      updateCartUI();
+      customInput.value = '';
+    }
+
+    function removeCartItem(index) {
+      if (cart[index].quantity > 1) cart[index].quantity--;
+      else cart.splice(index, 1);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const totalItems = cart.reduce((acc, i) => acc + i.quantity, 0);
+      cartCountSpan.innerText = totalItems;
+      const totalPrice = cart.reduce((acc, i) => acc + i.price * i.quantity, 0);
+      cartTotalSpan.innerText = `₹${totalPrice}`;
+
+      cartContainer.innerHTML = '';
+      if (cart.length === 0) {
+        cartContainer.innerHTML = '<span class="empty-cart-msg">your cart is empty</span>';
+        return;
+      }
+
+      cart.forEach((item, idx) => {
+        const pill = document.createElement('div');
+        pill.className = 'cart-item-pill';
+        pill.innerHTML = `
+          <span>${item.name}</span>
+          <small>₹${item.price}</small>
+          <span class="quant-badge">x${item.quantity}</span>
+          <button class="remove-item-cart" data-index="${idx}">✕</button>
+        `;
+        cartContainer.appendChild(pill);
+      });
+
+      document.querySelectorAll('.remove-item-cart').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = btn.getAttribute('data-index');
+          if (idx !== null) removeCartItem(parseInt(idx));
+        });
+      });
+    }
+
+    // ---------- address validation ----------
+    function updateAddressStatus() {
+      deliveryAddress = addressInput.value.trim();
+      if (deliveryAddress.length < 5) {
+        addressStatus.innerText = '⚠️ required';
+        placeOrderBtn.disabled = true;
+      } else {
+        addressStatus.innerText = '✓ address set';
+        placeOrderBtn.disabled = false;
+      }
+    }
+    addressInput.addEventListener('input', updateAddressStatus);
+
+    // ---------- place order ----------
+    window.attemptPlaceOrder = function() {
+      if (!isOpen) { alert('Restaurant offline'); return; }
+      if (cart.length === 0) { alert('Cart empty'); return; }
+      deliveryAddress = addressInput.value.trim();
+      if (deliveryAddress.length < 5) {
+        alert('Please enter your delivery address');
+        addressInput.focus();
+        return;
+      }
+
+      let msg = "🍛 *Goa Fresh Order*%0A";
+      msg += `📍 *Delivery address:* ${deliveryAddress}%0A`;
+      msg += `📌 *Restriction:* Kasa Amora only%0A%0A`;
+
+      let total = 0;
+      cart.forEach((item, i) => {
+        const sub = item.price * item.quantity;
+        msg += `${i+1}. ${item.name} x${item.quantity} - ₹${sub}%0A`;
+        total += sub;
+      });
+      msg += `%0A──────────%0A*TOTAL*: ₹${total}`;
+
+      window.open(`https://wa.me/${OWNER_PHONE}?text=${msg}`, '_blank');
+    };
+
+    // ---------- toggle open/offline (admin only) ----------
+    statusIndicator.addEventListener('click', function() {
+      if (!isAdmin) {
+        alert('Admin only: login as owner first');
+        return;
+      }
+      isOpen = !isOpen;
+      if (isOpen) {
+        statusDot.className = 'dot';
+        statusMsg.innerText = 'online';
+      } else {
+        statusDot.className = 'dot offline';
+        statusMsg.innerText = 'offline';
+      }
+    });
+
+    // ---------- admin login ----------
+    function showModal() { passInput.value = ''; modal.classList.add('show'); passInput.focus(); }
+    function hideModal() { modal.classList.remove('show'); }
+
+    function adminLogin() {
+      if (passInput.value === CORRECT_PASS) {
+        setAdminMode(true);
+        hideModal();
+      } else {
+        alert('wrong passcode');
+        passInput.value = '';
+        passInput.focus();
+      }
+    }
+
+    toggleBtn.addEventListener('click', showModal);
+    submitPass.addEventListener('click', (e) => { e.preventDefault(); adminLogin(); });
+    passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); adminLogin(); } });
+    cancelPass.addEventListener('click', hideModal);
+
+    // ---------- add new item (temporary, until saved) ----------
+    addItemBtn.addEventListener('click', function() {
+      if (!isAdmin) { alert('Admin only'); return; }
+      const name = newName.value.trim();
+      const price = parseFloat(newPrice.value);
+      const img = newImage.value.trim();
+      if (!name || isNaN(price) || price <= 0 || !img) {
+        alert('Please fill all fields (positive price, image URL)');
+        return;
+      }
+      foods.push({ name: name, price: price, img: img });
+      renderMenu();
+      // clear fields
+      newName.value = ''; newPrice.value = ''; newImage.value = '';
+    });
+
+    // ---------- SAVE ALL CHANGES PERMANENTLY ----------
+    saveChangesBtn.addEventListener('click', function() {
+      if (!isAdmin) { alert('Admin only'); return; }
+      saveMenuToStorage();
+    });
+
+    // ---------- custom item ----------
+    addCustomBtn.addEventListener('click', addCustomItem);
+    customInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomItem(); } });
+
+    // initialise
+    renderMenu();
+    updateCartUI();
+    updateAddressStatus();
+    setAdminMode(false); // start logged out
+  })();
+</script>
+</body>
+</html>
